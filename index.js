@@ -16,6 +16,8 @@ const redirectIfAuthenticatedMiddleware = require('./middleware/redirectIfAuthen
 
 app.set('view engine', 'ejs')
 
+global.loggedIn = null;
+
 // use the middleware to parse json bodies 
 app.use(express.static('public'))
 app.use(express.json())
@@ -25,7 +27,10 @@ app.use('/posts/store',validateMiddleWare)
 app.use(expressSession({
     secret:'keyboard cat'
 }))
-
+app.use("*", (req, res, next) => {
+    loggedIn = req.session.userId
+    next()
+}) 
 app.listen(3000, () => {
     console.log('App listening on port 3000')
 })
@@ -38,6 +43,7 @@ const newUserController = require('./controllers/newUser')
 const storeUserController = require('./controllers/storeUser')
 const loginController = require('./controllers/login')
 const loginUserController = require('./controllers/loginUser')
+const logoutController = require('./controllers/logout')
 
 app.get('/',homeController)
 
@@ -54,3 +60,9 @@ app.post('/users/register',redirectIfAuthenticatedMiddleware, storeUserControlle
 app.get('/auth/login',redirectIfAuthenticatedMiddleware, loginController)
 
 app.post('/users/login',redirectIfAuthenticatedMiddleware, loginUserController)
+
+app.get('/auth/logout', logoutController)
+
+app.use((req,res)=>{
+    res.render('notfound')
+})
