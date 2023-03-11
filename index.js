@@ -10,6 +10,8 @@ const { resourceUsage } = require('process')
 const fileUpload = require('express-fileupload')
 const validateMiddleWare = require('./middleware/validationMiddleware')
 const expressSession = require('express-session')
+const authMiddleware = require('./middleware/authMiddleware')
+const redirectIfAuthenticatedMiddleware = require('./middleware/redirectIfAuthenticatedMiddleware')
 
 
 app.set('view engine', 'ejs')
@@ -38,15 +40,17 @@ const loginController = require('./controllers/login')
 const loginUserController = require('./controllers/loginUser')
 
 app.get('/',homeController)
+
 app.get('/post/:id',getPostController)
-app.get('/posts/new',newPostController)
 
-app.post('/posts/store',storePostController)
+app.get('/posts/new',authMiddleware, newPostController)
 
-app.get('/auth/register', newUserController)
+app.post('/posts/store',authMiddleware, storePostController)
 
-app.post('/users/register',storeUserController)
+app.get('/auth/register',redirectIfAuthenticatedMiddleware, newUserController)
 
-app.get('/auth/login', loginController)
+app.post('/users/register',redirectIfAuthenticatedMiddleware, storeUserController)
 
-app.post('/users/login',loginUserController)
+app.get('/auth/login',redirectIfAuthenticatedMiddleware, loginController)
+
+app.post('/users/login',redirectIfAuthenticatedMiddleware, loginUserController)
