@@ -12,7 +12,7 @@ const validateMiddleWare = require('./middleware/validationMiddleware')
 const expressSession = require('express-session')
 const authMiddleware = require('./middleware/authMiddleware')
 const redirectIfAuthenticatedMiddleware = require('./middleware/redirectIfAuthenticatedMiddleware')
-
+const flash = require('connect-flash')
 
 app.set('view engine', 'ejs')
 
@@ -27,6 +27,8 @@ app.use('/posts/store',validateMiddleWare)
 app.use(expressSession({
     secret:'keyboard cat'
 }))
+
+app.use(flash())
 app.use("*", (req, res, next) => {
     loggedIn = req.session.userId
     next()
